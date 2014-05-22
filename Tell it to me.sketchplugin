@@ -1,0 +1,39 @@
+// Get a design quote from quotesondesign.com within the Sketch App by @nodesolomon
+// Thanks to Chris Coyer for making the API available
+
+// Useful function to get json data from url
+function getJSON (url) {
+    var request = NSURLRequest.requestWithURL(NSURL.URLWithString(url));
+    var response = NSURLConnection.sendSynchronousRequest_returningResponse_error(request, null, null);
+    return JSON.parse(NSString.alloc().initWithData_encoding(response, NSUTF8StringEncoding));
+}
+
+function sayIt (q) {
+  // Speak Quote
+  var say = NSTask.alloc().init();
+  say.setLaunchPath("/usr/bin/say");
+
+  var voices = [
+    "Agnes", "Kathy", "Princess", "Vicki", "Victoria",
+    "Bruce", "Fred", "Junior", "Ralph", "Albert", "Bad News",
+    "Bahh", "Bells", "Boing", "Bubbles", "Cellos", "Deranged",
+    "Good News", "Hysterical", "Pipe Organ", "Trinoids", "Whisper",
+    "Zarvox"
+  ];
+
+  var speaker = voices[Math.floor(Math.random() * voices.length)];
+
+  var phrase = q.author + " said: " + q.quote;
+  var args = NSArray.arrayWithObjects("-v", speaker, phrase, null);
+  say.setArguments(args);
+  say.launch();
+
+  return speaker;
+}
+
+// Get A Quote
+var QOD = getJSON("http://quotesondesign.com/api/3.0/api-3.0.json?no_cache=" + Math.floor(Math.random()*24000));
+var speaker = sayIt(QOD);
+
+var app = [NSApplication sharedApplication];
+[app displayDialog: QOD.quote withTitle:"Quote by" + " " + QOD.author + " spoken by " + speaker]
